@@ -6,6 +6,12 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
   operatorsAliases: false,
+//for localhost sql uses 3306 by default linxa yo cahi nalekhda huhnxa local host ma
+// port:3306,
+// yo port chai railway le deko pport for production
+port:7419,
+
+
   pool: {
     max: dbConfig.pool.max,
     min: dbConfig.pool.min,
