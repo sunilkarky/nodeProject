@@ -45,7 +45,25 @@
     line-height: 1.5;
     color: #777;
 }
+/* Navbar */
+.navbar {
+      background-color: #000;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 20px;
+    }
+    .navbar a {
+      color: #fff;
+      text-decoration: none;
+    }
+    .navbar a:hover {
+      color: #ddd;
+    }
 </style>
+<nav class="navbar">
+    <a href="/">Home</a>
+    </nav>
 <div class="blog-post">
     <h1 class="blog-title"><%-blog[0].title   %></h1>
     <h2 class="blog-subtitle"><%- blog[0].subTitle  %></h2>
