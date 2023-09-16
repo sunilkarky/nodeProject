@@ -1,0 +1,55 @@
+
+<style>
+  body, h1, h2, p {
+    margin: 0;
+    padding: 0;
+}
+
+/* Style for the blog container */
+.blog-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f7f7f7;
+}
+
+/* Style for the blog post */
+.blog-post {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    max-width: 600px;
+    width: 100%;
+}
+
+/* Style for the blog title */
+.blog-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Style for the blog subtitle */
+.blog-subtitle {
+    font-size: 24px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* Style for the blog description */
+.blog-description {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #777;
+}
+</style>
+<div class="blog-post">
+    <h1 class="blog-title"><%-blog[0].title   %></h1>
+    <h2 class="blog-subtitle"><%- blog[0].subTitle  %></h2>
+    <p class="blog-description"><%-blog[0].description   %></p>
+    <button><a href="/delete/<%-blog[0].id%>">Delete</a></button>
+    <button><a href="/edit/<%-blog[0].id%>">Edit</a></button>
+</div>

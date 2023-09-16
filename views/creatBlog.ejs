@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<head>
+  <title>title</title>
+
+<style>
+.form-group {
+    margin-bottom: 10px;
+  }
+  .form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  .btn {
+    background-color: #000;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  /* Navbar */
+  .navbar {
+    background-color: #000;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+  }
+  .navbar a {
+    color: #fff;
+    text-decoration: none;
+  }
+  .navbar a:hover {
+    color: #ddd;
+  }
+  
+  /* Cards */
+  .card {
+    width: 200px;
+    margin: 10px;
+    border: 1px solid #ddd;
+    padding: 10px;
+  }
+  .card .title {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .card .subtitle {
+    font-size: 16px;
+  }
+  .card .description {
+    font-size: 14px;
+  }
+  .navbar {
+      background-color: #000;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+    }
+    .navbar a {
+      color: #fff;
+      text-decoration: none;
+    }
+    .navbar a:hover {
+      color: #ddd;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/">Home</a>
+    
+  </nav>
+<form action="/creatBlog" method="post">
+
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input name="title" type="text" class="form-control" id="title" placeholder="Enter the title">
+    </div>
+    <div class="form-group">
+      <label for="subtitle">Subtitle</label>
+      <input name="subtitle" type="text" class="form-control" id="subtitle" placeholder="Enter the subtitle">
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea name="description"class="form-control" id="description" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  </body>
+  </html>
