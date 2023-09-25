@@ -1,5 +1,10 @@
 const express=require("express")
-const { blogs } = require("./model/index")
+const { blogs, users } = require("./model/index")
+//this is for importing hashing npm install bcryptjs and importing so we can use it
+const bcrypt=require("bcryptjs") //now you can hash your password
+
+
+
 const app=express()
 //dbconnection
 require("./model/index")
@@ -113,7 +118,54 @@ await blogs.update({
 
 
 })
+// app.get("/portfolio",(req,res)=>{
+    
+//     // res.send("portfolio")
+//     res.render("index.ejs")
 
+
+// })
+app.get("/register",(req,res)=>{
+    res.render("register")
+})
+app.post("/register",async(req,res)=>{
+    
+
+    console.log(req.body)
+    const {username,password,email,confirmPassword}=req.body
+
+    //insert hunu vanda agadi check garnu paro ki pass and confirm pass match or not
+    // if(password.toLowerCase()!==confirmPassword.toLowerCase()){ //yo halda chai alik aramro hunxa
+    //     return res.send("Password and confirm password doesnot match")
+    // }
+    if(password!==confirmPassword){ 
+            return res.send("Password and confirm password doesnot match")
+
+    }
+
+
+    //insert into table of database
+    await users.create({
+
+        email:email,
+        username:username,
+        password:bcrypt.hashSync(password,8)
+
+    })
+    res.redirect("/")
+})
+
+
+//to login form get k garney after login
+app.get("/login",(req,res)=>{
+
+
+    res.render("login")
+})
+app.post("/login",(req,res)=>{
+    console.log(req.body)
+    res.send("Successfull login")
+})
 
 app.listen(3000,()=>{
     console.log("The node project started at port 3000")

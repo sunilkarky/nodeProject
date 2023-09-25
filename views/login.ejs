@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login Form</title>
+  <style>
+    /* Form */
+    form {
+      border: 3px solid #f1f1f1;
+      width: 300px;
+      margin: 0 auto;
+    }
+
+    /* Input fields */
+    input[type=email], input[type=password] {
+      width: 100%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    /* Button */
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    /* Button hover effect */
+    button:hover {
+      opacity: 0.8;
+    }
+
+      h1{
+        color:powderblue;
+        text-align:center;
+      }
+    
+  </style>
+</head>
+<body>
+
+  <h1>Login Form</h1>
+
+  <form action="/login" method="post">
+    <input type="email" name="email" placeholder="Email Address">
+    <input type="password" name="password" placeholder="Password">
+    <button type="submit">Login</button>
+  </form>
+
+</body>
+</html>
