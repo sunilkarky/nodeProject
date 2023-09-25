@@ -4,8 +4,13 @@ const { blogs, users } = require("./model/index")
 const bcrypt=require("bcryptjs") //now you can hash your password
 
 
+const jwt=require("jsonwebtoken") //npm installjsonwebtoken garera import gareko for use after login successfull
+const { configDotenv } = require("dotenv")
+
+
 
 const app=express()
+require('dotenv').config() //for encrytping ifle
 //dbconnection
 require("./model/index")
 
@@ -189,8 +194,21 @@ app.post("/login",async(req,res)=>{
         const isMatched =bcrypt.compareSync(password,passwordVerified) //true ofr false return
         
         //check if matched or not
-        if(isMatched){
+        if(isMatched){  
+            console.log(process.env.SECRETKEY) //token always login vayesi matra soo
+            // const token=jwt.sign({name:"manish"},process.env.SECRETKEY,{expiresIn:"30d"}) //set gareko hamr token
+            const token=jwt.sign({id:userEmailExist[0].id},process.env.SECRETKEY,{expiresIn:"30d"}) 
+
+            //aba yo token cokkie ma save garera rakhney
+            res.cookie('token',token,{//browserma application tab vitracokkie vanney ma save garxa
+                secure:true, //suruko token chai uta browser ma k nam bata dine ra second is our variable here
+                expireIn:"120",  //120 sec
+            })
+            
+            
             res.send("login Successfull")
+
+
         }
             else{
                 res.send("invalid Password")
