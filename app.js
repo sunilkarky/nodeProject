@@ -152,7 +152,7 @@ app.post("/register",async(req,res)=>{
         password:bcrypt.hashSync(password,8)
 
     })
-    res.redirect("/")
+    res.redirect("/login")
 })
 
 
@@ -162,10 +162,45 @@ app.get("/login",(req,res)=>{
 
     res.render("login")
 })
-app.post("/login",(req,res)=>{
+app.post("/login",async(req,res)=>{
     console.log(req.body)
-    res.send("Successfull login")
-})
+    // res.send("Successfull login")
+    const {email,password}=req.body //form ko nme r yo email pas ko name sam ehunu paro
+      //server side validation pani garxuparxa for moree security even if client side veerification
+
+      if(!email||!password){
+        return res.send("Email and Password are required")
+      }
+
+      //first check ifemail exist or not in our tableof registered user
+      const userEmailExist=await users.findAll({
+        where:{
+            email:email //yesle chai array ma yo email sanga associated data name password like databaseko sab row dinxa
+
+        }
+      })
+      //if email doesnot exist yasle empty dinxa so validate that
+
+      if(userEmailExist.length==0){
+        res.send("user with that email doesnot exist")
+      }else{
+        // email vayo vane matra yo block ma aauxa aba password ni check garnu paro
+        const passwordVerified=userEmailExist[0].password
+        const isMatched =bcrypt.compareSync(password,passwordVerified) //true ofr false return
+        
+        //check if matched or not
+        if(isMatched){
+            res.send("login Successfull")
+        }
+            else{
+                res.send("invalid Password")
+            }
+        }
+
+
+
+
+    })
 
 app.listen(3000,()=>{
     console.log("The node project started at port 3000")
