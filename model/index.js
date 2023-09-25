@@ -39,6 +39,13 @@ db.blogs = require("./blogModel.js")(sequelize, DataTypes);//blog table
 db.users = require("./userModel.js")(sequelize, DataTypes);//user table   //yo name chai aafule j lekhda hunxa ani yo chai use garnu parxa uta app.js ma kam garnalai
 
 
+//thikka db.blogs ra user ko tala aba relation dekhauney so we can access whose blog is that
+//so we make a user id new column at blogs suing relation
+
+db.users.hasMany(db.blogs)
+db.blogs.belongsTo(db.users)   //yo chai relation banako yati garda aba uta gara chechk garda aauda
+                                // aba yasmadirect column add garna garo hunxa sql ma so we make talaka false true banaunu prxa jsle sab data udaidinxanai pheri false garda hunxa
+                                //tara mongo hruma direct hunxa
 db.sequelize.sync({ force: false }).then(() => {
   console.log("yes re-sync done");
 });
