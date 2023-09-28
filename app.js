@@ -3,69 +3,52 @@ const { blogs, users } = require("./model/index")
 //this is for importing hashing npm install bcryptjs and importing so we can use it
 const bcrypt=require("bcryptjs") //now you can hash your password
 
+require("./controller/blog/blogController")
+
+//for middleware
+const {isAuthenticated}=require("./middleware/isAuthenticated");
 
 const jwt=require("jsonwebtoken") //npm installjsonwebtoken garera import gareko for use after login successfull
 const { configDotenv } = require("dotenv")
+const cookieParser = require("cookie-parser")  //for getting cookie from browser req.cookie.token direct bujdaina so
 
 
+//is authenticated ma hhune erequire garne
+const { JsonWebTokenError, decode } = require("jsonwebtoken")
+
+// const promisify=require("util").promisify//cookie sction ma error haldle garna 
+// const {promisify}=require("util")   
+const { creatBlog, renderSingleBlog, renderCreatBlog } = require("./controller/blog/blogController")
 
 const app=express()
 require('dotenv').config() //for encrytping ifle
 //dbconnection
 require("./model/index")
+require("./middleware/isAuthenticated")
+
 
 
 app.set('view engine','ejs')
+
+app.use(cookieParser())   //yo chau be careful
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 app.get("/",async(req,res)=>{
-    const allblogs=await blogs.findAll()//blogs vne table ko sab data find garera dinxa//yati garda json ma return grxa database records
-    console.log(allblogs)               // next we need to pass it to blogs.ejs file
+    const allblogs = await blogs.findAll()//blogs vne table ko sab data find garera dinxa//yati garda json ma return grxa database records
+    // console.log(allblogs)               // next we need to pass it to blogs.ejs file
     res.render("blogs",{blogs:allblogs}) //blogs j lekhda vo allblogs ma chai dat astore xa tye lekhnu
 })
 
-app.get("/creatBlog",(req,res)=>{
-    res.render("creatBlog")
-})
+app.get("/creatBlog",renderCreatBlog)
 
 
 //api banako for form submit
 //crreatblog post
-app.post("/creatBlog",async (req,res)=>{
-    //firs process to insert data from form to database
-        //this is fisr step to convet jason format file to const
-    const title=req.body.title
-    const subtitle=req.body.subtitle
-    const description=req.body.description
-    console.log(title,subtitle,description) 
-            //this is to insert into database using sequlite easy feature .create instead of sql insert query
-    await blogs.create({  //index.js ma db.blogs xa so j xa tye use
+app.post("/creatBlog",isAuthenticated,creatBlog)
 
-        title:title,  //column :mathiko const ko name
-        subTitle:subtitle,
-        description:description
-
-
-    })
-
-
-    res.redirect('/')  //yo chai parse grnu prxa natra data lidaina  for comment of blog.ejs /*this is displayed in our browser so<%- use*
-                            
-})
-
-app.get("/single/:id",async(req,res)=>{   //this is params fro url ma dekhaune /single/id wala ko
-    console.log(req.params.id)
-    const id=req.params.id
-    const blog =await blogs.findAll({
-            where:{
-                id:id  //our id and database name of id match hune sab display
-            }
-    })
-    console.log(blog)
-    res.render("singleBlogs",{blog:blog}) //name any and second yHko DEFINE vko var      
-})
+app.get("/single/:id",renderSingleBlog)
 
 //delete page of id
 app.get("/delete/:id",async(req,res)=>{
@@ -123,13 +106,6 @@ await blogs.update({
 
 
 })
-// app.get("/portfolio",(req,res)=>{
-    
-//     // res.send("portfolio")
-//     res.render("index.ejs")
-
-
-// })
 app.get("/register",(req,res)=>{
     res.render("register")
 })
@@ -168,7 +144,7 @@ app.get("/login",(req,res)=>{
     res.render("login")
 })
 app.post("/login",async(req,res)=>{
-    console.log(req.body)
+    // console.log(req.body)
     // res.send("Successfull login")
     const {email,password}=req.body //form ko nme r yo email pas ko name sam ehunu paro
       //server side validation pani garxuparxa for moree security even if client side veerification
@@ -195,8 +171,9 @@ app.post("/login",async(req,res)=>{
         
         //check if matched or not
         if(isMatched){  
-            console.log(process.env.SECRETKEY) //token always login vayesi matra soo
+            // console.log(process.env.SECRETKEY) //token always login vayesi matra soo
             // const token=jwt.sign({name:"manish"},process.env.SECRETKEY,{expiresIn:"30d"}) //set gareko hamr token
+            // token banauna yo sign vanne methon jsonwt lw deko hunxa
             const token=jwt.sign({id:userEmailExist[0].id},process.env.SECRETKEY,{expiresIn:"30d"}) 
 
             //aba yo token cokkie ma save garera rakhney
@@ -214,11 +191,8 @@ app.post("/login",async(req,res)=>{
                 res.send("invalid Password")
             }
         }
-
-
-
-
     })
+
 
 app.listen(3000,()=>{
     console.log("The node project started at port 3000")
