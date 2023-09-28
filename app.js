@@ -18,7 +18,7 @@ const { JsonWebTokenError, decode } = require("jsonwebtoken")
 
 // const promisify=require("util").promisify//cookie sction ma error haldle garna 
 // const {promisify}=require("util")   
-const { creatBlog, renderSingleBlog, renderCreatBlog } = require("./controller/blog/blogController")
+const { creatBlog, renderSingleBlog, renderCreatBlog, renderallBlog, renderDeleteBlog, renderEditBlog, editBlog, rendermyBlogs} = require("./controller/blog/blogController")
 
 const app=express()
 require('dotenv').config() //for encrytping ifle
@@ -35,11 +35,11 @@ app.use(cookieParser())   //yo chau be careful
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
-app.get("/",async(req,res)=>{
-    const allblogs = await blogs.findAll()//blogs vne table ko sab data find garera dinxa//yati garda json ma return grxa database records
-    // console.log(allblogs)               // next we need to pass it to blogs.ejs file
-    res.render("blogs",{blogs:allblogs}) //blogs j lekhda vo allblogs ma chai dat astore xa tye lekhnu
-})
+
+
+
+
+app.get("/",renderallBlog)
 
 app.get("/creatBlog",renderCreatBlog)
 
@@ -51,61 +51,22 @@ app.post("/creatBlog",isAuthenticated,creatBlog)
 app.get("/single/:id",renderSingleBlog)
 
 //delete page of id
-app.get("/delete/:id",async(req,res)=>{
-    // res.send("from delete page")
-    console.log(req.params.id)
-    const id=req.params.id
-    const deleteblog=await blogs.destroy ({  //aaru creat single jasto yasma chai var pass grnu  prdaina so const delete blog define nagari direct awaitblogs.destry garda hunxa
-        where:{
-            id:id    //table id and hamro req.params bata aako id
-        }
-    })       //blogs table.destroy for delete
-    res.redirect("/")
-})
+app.get("/delete/:id",isAuthenticated,renderDeleteBlog)
 
 
 
 
 
 //edit blogs yo chai view garauney api hoo post garney xuttai h8nnxa
-app.get("/edit/:id",async(req,res)=>{
-    console.log(req.params.id)
-    const id=req.params.id
-    //find blogs of that id and prefill before uodating iso we do this and pass to our ejs file
-   const blog=await blogs.findAll({
-    where:{
-        id:id
-    }
-   })
-    res.render("editBlog",{blog:blog}) //aba yo chai form ko inputtag ko value vanne ma halnu parxa tya j hunx atye variyera aauxa so 
-
-})
+app.get("/edit/:id",isAuthenticated,renderEditBlog)
 
 // yp chai post garney api cretae garnu par
 
-app.post("/editBlog/:id",async(req,res)=>{   //editblog ko form action ma jun j api hit gareko nam xa tye
-
-    console.log(req.body)
-    const id=req.params.id
-const title=req.body.title
-const description=req.body.description   //console ma aako name
-const subtitle=req.body.subtitle
-
-await blogs.update({
-    title: title,
-    subTitle: subtitle,
-    description: description
-},{
-    where:{
-        id:id
-    }
-})
+app.post("/editBlog/:id",isAuthenticated,editBlog)
 
 
-    res.redirect("/")
+app.get("/myBlogs",isAuthenticated,rendermyBlogs)
 
-
-})
 app.get("/register",(req,res)=>{
     res.render("register")
 })

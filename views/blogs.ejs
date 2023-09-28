@@ -52,6 +52,7 @@
     <a href="/creatBlog">Add Blogs</a>
     <a href="/login">login</a>
     <a href="/register">Register</a>
+    <a href="/myBlogs">My Blogs</a>
     <div>
     
   </nav>
@@ -61,6 +62,8 @@
       <h2 class="title"><%-blog.title%></h2>
       <h3 class="subtitle"><%-blog.subTitle%></h3>
       <p class="description"><%-blog.description%></p>
+      <p class="description">Author : <%-blog.user.username%></p>  <!--join vara aako data of next joined table-->
+      <p class="description">Email of author : <%-blog.user.email%></p>
       <a href="/single/<%-blog.id%>">See more</a>
     </div>
   
