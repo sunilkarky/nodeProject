@@ -21,8 +21,13 @@ exports.renderCreatBlog=(req,res)=>{
 }
 
 exports.creatBlog=async (req,res)=>{
+    //for image handling
+    console.log(req.file) //file type ko chai req.file ma aauxa not body
+    const fileName=req.file.filename
 
-    console.log(req.user[0].id,"userID from middleware isauthenticated")//aba tanera matra hain table ma user id vanne column ma halnu ni paro nita ie link thyo ni tyo
+
+
+    // console.log(req.user[0].id,"userID from middleware isauthenticated")//aba tanera matra hain table ma user id vanne column ma halnu ni paro nita ie link thyo ni tyo
     const userId=req.user[0].id //token bata aako id authenticate garera ab tyo id hamro table ko user id ma halneyy by creating 
 
     //firs process to insert data from form to database
@@ -31,6 +36,9 @@ exports.creatBlog=async (req,res)=>{
     const subtitle=req.body.subtitle
     const description=req.body.description
     // console.log(title,subtitle,description) 
+    if(!title||!subtitle||!description||!req.file){  //server validation
+        return res.send("please fill aall the fields above")
+    }
             //this is to insert into database using sequlite easy feature .create instead of sql insert query
     await blogs.create({  //index.js ma db.blogs xa so j xa tye use
 
@@ -38,9 +46,9 @@ exports.creatBlog=async (req,res)=>{
         subTitle:subtitle,
         description:description,
         //after authenticated vara aara middleware ppass garera aako ani mathi define grerra assign gareko xa yo
-        userId:userId
-
-
+        userId:userId   , //userID:req.userId from repo
+                           //image:fileName     //image cahi nabasne vara hamile ysari view garna sakinxa image:"http://localhost:4000/"+fileName
+        image:process.env.IMAGE_URL + fileName      // http jodera direct database ma link save garna lai gareeko by adding   
     })
 
 

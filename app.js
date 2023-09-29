@@ -8,6 +8,11 @@ require("./controller/blog/blogController")
 //for middleware
 const {isAuthenticated}=require("./middleware/isAuthenticated");
 
+
+//for image handling this is done
+const { multer, storage } = require("./middleware/multerConfig"); //../ route bahira aara middleware vitra /multerConfig ma
+const upload = multer({ storage: storage }); //jun uta multerConfig ma export garreko thyo multer ra storage tyo yha liyako
+
 const jwt=require("jsonwebtoken") //npm installjsonwebtoken garera import gareko for use after login successfull
 const { configDotenv } = require("dotenv")
 const cookieParser = require("cookie-parser")  //for getting cookie from browser req.cookie.token direct bujdaina so
@@ -30,6 +35,8 @@ require("./middleware/isAuthenticated")
 
 app.set('view engine','ejs')
 
+app.use(express.static("uploads/"))   //yo chai fileherna de vaneko
+
 app.use(cookieParser())   //yo chau be careful
 
 app.use(express.json())
@@ -46,7 +53,7 @@ app.get("/creatBlog",renderCreatBlog)
 
 //api banako for form submit
 //crreatblog post
-app.post("/creatBlog",isAuthenticated,creatBlog)
+app.post("/creatBlog",isAuthenticated,upload.single('image'),creatBlog)   //.singl rfor single image .array for multipeb also uta form ma name="" j xa tye
 
 app.get("/single/:id",renderSingleBlog)
 
@@ -155,6 +162,6 @@ app.post("/login",async(req,res)=>{
     })
 
 
-app.listen(3000,()=>{
+app.listen(4000,()=>{
     console.log("The node project started at port 3000")
 })
