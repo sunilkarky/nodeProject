@@ -23,7 +23,7 @@ const { JsonWebTokenError, decode } = require("jsonwebtoken")
 
 // const promisify=require("util").promisify//cookie sction ma error haldle garna 
 // const {promisify}=require("util")   
-const { creatBlog, renderSingleBlog, renderCreatBlog, renderallBlog, renderDeleteBlog, renderEditBlog, editBlog, rendermyBlogs} = require("./controller/blog/blogController")
+const { creatBlog, renderSingleBlog, renderCreatBlog, renderallBlog, renderDeleteBlog, renderEditBlog, editBlog, rendermyBlogs, renderLogout} = require("./controller/blog/blogController")
 
 const app=express()
 require('dotenv').config() //for encrytping ifle
@@ -43,11 +43,14 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 
+//yo chai thikka cookie-parser ko tala
+
 //aba chai login vako lai matra addblog dekhaune haru grna yo grnu prxa i.e check ogin xaki xaina
+    //middleware ho yo eakkhalko jun harek [alii trigger garna milxa]
 app.use((req,res,next)=>{  //yo chai harek pali trigger hunxa app.js ma lekheko kura
     // console.log("hello hi ma pheri aaye")             // yo pani eauta middlewaare ho jun harek pali j garda ni trigger hunxa
-    res.locals.currentUser=req.cookies.token //yo chai global variable can be used at any place you want
-    next()
+    res.locals.currentUser=req.cookies.token //yo chai global variable can be used at any place you want i.e currentUser jani acces garna pauxu ma aba
+    next()    //next ma janxa mathika vara                               //
 
 })
 
@@ -57,7 +60,7 @@ app.use((req,res,next)=>{  //yo chai harek pali trigger hunxa app.js ma lekheko 
 
 app.get("/",renderallBlog)
 
-app.get("/creatBlog",renderCreatBlog)
+app.get("/creatBlog",isAuthenticated,renderCreatBlog)
 
 
 //api banako for form submit
@@ -169,6 +172,8 @@ app.post("/login",async(req,res)=>{
             }
         }
     })
+
+app.get("/logout",renderLogout)
 
 
 app.listen(3000,()=>{

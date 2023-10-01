@@ -5,16 +5,18 @@ var storage = multer.diskStorage({
         //destination vitra garne kinaki yahi file save hunxa kun kasto file save grne vanera
     //logic to validate filetype jpt ecxtension ko file nadine(mimeType/filetype)
     const allowedFileTypes=['image/png','image/jpg','image/jpeg']
+    //silalarly filesize haru ni aako hunxa req.file ma tyoni check garda vo hai
+
     if(!allowedFileTypes.includes(file.mimetype)){   //file.mimetype ma file ko type aauxayaah
       //cb(eauta argument)i.e error
-      cb(new Error("invalid file type")) //new error initialize //res.send hudaina middleware ma so yasari error dekhauxa parxa usin callback
+      cb(new Error("invalid file type from multerconfig maile msg pathako")) //new error initialize //res.send hudaina middleware ma so yasari error dekhauxa parxa usin callback
       return; // xaina vane yahi bata return vay
 
       }
       //yo chai else jastai vayo
     console.log(file.mimeType)
     //cb(a,b)i.e 2 arguments i.e success
-    cb(null, "./uploads/");   //yaha uploads ma store garne folder
+    cb(null, "./uploads/");  //sucesss then //yaha uploads ma store garne folder
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + "-" + file.originalname);  //yeslechai filename k rakhne tsma aagadi time jodera for not duplixcation

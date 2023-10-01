@@ -139,4 +139,8 @@ exports.rendermyBlogs=async(req,res)=>{
     res.render("myBlogs",{myBlogs:myBlogs})  
 }
 
-// exports.logOut
+exports.renderLogout=(req,res)=>{ //cokie clear han vane direct logout
+    res.clearCookie('token')
+    res.redirect("/")  //clearCookie ani aarko nam hamro cookiema k clear grney
+
+}
