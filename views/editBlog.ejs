@@ -72,7 +72,7 @@
     <a href="/">Home</a>
     
   </nav>
-<form action="/editBlog/<%-blog[0].id%>" method="post">
+<form action="/editBlog/<%-blog[0].id%>" method="post" enctype="multipart/form-data">
 
     <div class="form-group">
       <label for="title">Title</label>
@@ -82,6 +82,12 @@
       <label for="subtitle">Subtitle</label>
       <input name="subtitle" value="<%-blog[0].subTitle%>" type="text" class="form-control" id="subtitle" placeholder="Enter the subtitle">
     </div>
+
+    <div class="form-group">
+      <label for="image">image</label>
+      <input name="image" value="<%-blog[0].image%>" type="file" class="form-control" id="image" >
+    </div>
+
     <div class="form-group">
       <label for="description">Description</label>
       <textarea name="description"  class="form-control"  id="description" rows="3"><%-blog[0].description%></textarea>

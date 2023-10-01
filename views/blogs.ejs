@@ -49,12 +49,15 @@
   <nav class="navbar">
     <h1><div><u>CMS</u></div></h1>
     <div>
-    <a href="/creatBlog">Add Blogs</a>
-    <a href="/login">login</a>
+     <% if(!currentUser){ %>
+        <a href="/login">login</a>
     <a href="/register">Register</a>
-    <a href="/myBlogs">My Blogs</a>
+     <% }else{%>
+      <a href="/creatBlog">Add Blogs</a>
+      <a href="/myBlogs">My Blogs</a>
+      
     <div>
-    
+    <%}%>
   </nav>
   <div class="cards">           
     <% blogs.forEach((blog)=>{%> 

@@ -12,7 +12,7 @@ exports.renderallBlog=async(req,res)=>{
             model:users   //model nai hunxa aarko chai tablename aba chai allblogs ma users table i jodera janxa and we can access it through blog.user.username
         }
     })
-    console.log(allblogs)               // next we need to pass it to blogs.ejs file
+    // console.log(allblogs)               // next we need to pass it to blogs.ejs file
     res.render("blogs",{blogs:allblogs}) //blogs j lekhda vo allblogs ma chai dat astore xa tye lekhnu also after join we can acces next table using blog.user.username in ejs file
 }
 
@@ -23,8 +23,7 @@ exports.renderCreatBlog=(req,res)=>{
 exports.creatBlog=async (req,res)=>{
     //for image handling
     console.log(req.file) //file type ko chai req.file ma aauxa not body
-    const fileName=req.file.filename
-
+    const fileName=req.file.filename   
 
 
     // console.log(req.user[0].id,"userID from middleware isauthenticated")//aba tanera matra hain table ma user id vanne column ma halnu ni paro nita ie link thyo ni tyo
@@ -99,16 +98,24 @@ exports.renderEditBlog=async(req,res)=>{
 
 exports.editBlog=async(req,res)=>{   //editblog ko form action ma jun j api hit gareko nam xa tye
 
-    console.log(req.body)
+    const fileName=req.file.filename
+
+
+    // console.log(req.body)
+    // console.log(req.file)
     const id=req.params.id
 const title=req.body.title
 const description=req.body.description   //console ma aako name
 const subtitle=req.body.subtitle
+if(!title||!subtitle||!description||!req.file){  //server validation
+        return res.send("please fill aall the fields above")
+    }
 
 await blogs.update({
     title: title,
     subTitle: subtitle,
-    description: description
+    description: description,
+    image:process.env.IMAGE_URL + fileName    // image: process.env.IMAGE_URL+fileName
 },{
     where:{
         id:id
@@ -131,3 +138,5 @@ exports.rendermyBlogs=async(req,res)=>{
     })
     res.render("myBlogs",{myBlogs:myBlogs})  
 }
+
+// exports.logOut

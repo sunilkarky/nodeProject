@@ -43,6 +43,15 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 
+//aba chai login vako lai matra addblog dekhaune haru grna yo grnu prxa i.e check ogin xaki xaina
+app.use((req,res,next)=>{  //yo chai harek pali trigger hunxa app.js ma lekheko kura
+    // console.log("hello hi ma pheri aaye")             // yo pani eauta middlewaare ho jun harek pali j garda ni trigger hunxa
+    res.locals.currentUser=req.cookies.token //yo chai global variable can be used at any place you want
+    next()
+
+})
+
+
 
 
 
@@ -69,7 +78,7 @@ app.get("/edit/:id",isAuthenticated,renderEditBlog)
 
 // yp chai post garney api cretae garnu par
 
-app.post("/editBlog/:id",isAuthenticated,editBlog)
+app.post("/editBlog/:id",isAuthenticated,upload.single('image'),editBlog)
 
 
 app.get("/myBlogs",isAuthenticated,rendermyBlogs)
@@ -162,6 +171,6 @@ app.post("/login",async(req,res)=>{
     })
 
 
-app.listen(4000,()=>{
+app.listen(3000,()=>{
     console.log("The node project started at port 3000")
 })
