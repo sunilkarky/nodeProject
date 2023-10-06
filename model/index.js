@@ -46,7 +46,7 @@ db.users.hasMany(db.blogs)
 db.blogs.belongsTo(db.users)   //yo chai relation banako yati garda aba uta gara chechk garda aauda
                                 // aba yasmadirect column add garna garo hunxa sql ma so we make talaka false true banaunu prxa jsle sab data udaidinxanai pheri false garda hunxa
                                 //tara mongo hruma direct hunxa
-db.sequelize.sync({ force: false }).then(() => {
+db.sequelize.sync({ force:false }).then(() => {
   console.log("yes re-sync done");
 });
 

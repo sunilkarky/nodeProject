@@ -1,5 +1,9 @@
 const { blogs, users } = require("../../model")
 
+//package for file system handling  edit grda aako 2 tai file save vako 
+
+const fs=require("fs") //uploads folder ma kam garna delete update
+
 
 
 
@@ -64,20 +68,44 @@ exports.renderSingleBlog=async(req,res)=>{   //this is params fro url ma dekhaun
                 model:users   //single blog mani author haru dekhauna milo user table access
             }
     })
-    console.log(blog)
+    // console.log(blog)
     res.render("singleBlogs",{blog:blog}) //name any and second yHko DEFINE vko var      
 }
 
 
 exports.renderDeleteBlog=async(req,res)=>{
     // res.send("from delete page")
-    console.log(req.params.id)
+    // console.log(req.params.id)
     const id=req.params.id
+
+    // image handling
+    const oldDatas=await blogs.findAll({
+        where:{
+            id:id
+        }
+    })
+    console.log(oldDatas)
+    const oldFilePath=oldDatas[0].image
+    console.log(oldFilePath)
+    const fileNameInUploadsFolder=oldFilePath.slice(22)
+    console.log(fileNameInUploadsFolder)
+    fs.unlink("uploads/"+ fileNameInUploadsFolder,(err)=>{
+        if(err){
+            console.log("deletion Erroe occurred")
+        }else{
+            console.log("Deletion successfull")
+        }
+    })
+
     const deleteblog=await blogs.destroy ({  //aaru creat single jasto yasma chai var pass grnu  prdaina so const delete blog define nagari direct awaitblogs.destry garda hunxa
         where:{
             id:id    //table id and hamro req.params bata aako id
         }
     })       //blogs table.destroy for delete
+    
+    
+    
+    
     res.redirect("/")
 }
 
@@ -98,7 +126,7 @@ exports.renderEditBlog=async(req,res)=>{
 
 exports.editBlog=async(req,res)=>{   //editblog ko form action ma jun j api hit gareko nam xa tye
 
-    const fileName=req.file.filename
+    // const fileName=req.file.filename
 
 
     // console.log(req.body)
@@ -107,7 +135,40 @@ exports.editBlog=async(req,res)=>{   //editblog ko form action ma jun j api hit 
 const title=req.body.title
 const description=req.body.description   //console ma aako name
 const subtitle=req.body.subtitle
-if(!title||!subtitle||!description||!req.file){  //server validation
+
+//
+const oldDatas= await blogs.findAll({
+    where:{
+        id:id
+    }
+})
+let fileurl;
+if(req.file){
+    fileurl=process.env.IMAGE_URL +req.file.filename //naya url ho yodatabase ma basxa
+
+        //yadi naya file halo vane matra delete gare image
+    const oldImagePath=oldDatas[0].image  //deete garnu parne file ho yo full link
+    console.log(oldImagePath)  //http://localhost:3000/1696566591279-Screenshot from 2023-10-04 20-31-34.png
+    //aba hamro file name ta localhost wala part haina so slice garne tsliani aarko file name chai hekc garney
+    const lengthOfUnwanted="http://localhost:3000/".length
+    console.log(lengthOfUnwanted) //yesle chai length nikalxa kati chai slice garnu parxa
+    const fileNameInUploadsFolder=oldImagePath.slice(lengthOfUnwanted) //yati chai katde vaneko
+    console.log(fileNameInUploadsFolder)  //we need this path for deleting file from uploads folder
+    
+    //aba fsunlink bata delete grne dynimically
+    fs.unlink("uploads/"+fileNameInUploadsFolder,(err)=>{
+        if(err){
+            console.log("Error occured while deleting file")
+        }
+        else{
+            console.log("File deleted successfully")
+        }
+    })
+}
+else{
+    fileurl=oldDatas[0].image
+}
+if(!title||!subtitle||!description){  //server validation
         return res.send("please fill aall the fields above")
     }
 
@@ -115,15 +176,26 @@ await blogs.update({
     title: title,
     subTitle: subtitle,
     description: description,
-    image:process.env.IMAGE_URL + fileName    // image: process.env.IMAGE_URL+fileName
+    image:fileurl   // image: process.env.IMAGE_URL+fileName
 },{
     where:{
         id:id
     }
 })
+    //this is for deleting edit gareko file with same name
+    // yasari kunai file delete garna sakinxa by putting path
+// fs.unlink("uploads/1696420353428-1.png",(err)=>{ //yo chai edit chalauda delete hunxa
+//     if(err){
+//         console.log("Error occurred")
+//     }else{
+//         console.log("Deletion successfull")
+//     }
+// })
 
 
-    res.redirect("/")
+    
+    
+    res.redirect("/single/"+ id)
 
 
 }
