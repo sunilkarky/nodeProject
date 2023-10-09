@@ -23,7 +23,9 @@ const { JsonWebTokenError, decode } = require("jsonwebtoken")
 
 // const promisify=require("util").promisify//cookie sction ma error haldle garna 
 // const {promisify}=require("util")   
-const { creatBlog, renderSingleBlog, renderCreatBlog, renderallBlog, renderDeleteBlog, renderEditBlog, editBlog, rendermyBlogs, renderLogout} = require("./controller/blog/blogController")
+const { creatBlog, renderSingleBlog, renderCreatBlog, renderallBlog, renderDeleteBlog, renderEditBlog, editBlog, rendermyBlogs, renderLogout} = require("./controller/blog/blogController");
+const { render } = require("ejs");
+const sendEmail = require("./services/sendEmail");
 
 const app=express()
 require('dotenv').config() //for encrytping ifle
@@ -174,6 +176,36 @@ app.post("/login",async(req,res)=>{
     })
 
 app.get("/logout",renderLogout)
+
+app.get("/renderForgotPassword",(req,res)=>{
+    res.render("forgotPassword")
+
+})
+app.post("/forgotPassword",async(req,res)=>{
+    const email=req.body.email
+    console.log(email)
+    //email hlnu parxa validation
+    if(!email){
+        return res.send("please provide email")
+    }
+    // aba chai check garnu paro ki tyo email xa ki xain in our table of users
+    const emailExists=await users.findAll({
+        where:{
+            email:email
+        }
+    })
+    if(emailExists.length==0){
+        return res.send("User with that email doesnot exist")
+    }else{  //if user exist with that emaail then send otp
+        await sendEmail({   //2 ta argument xa ypo function ko uta  services ko send mail options le chai object linxa
+            email:email,  // to: options.email, suruko uta j namko xa key tye linu paro  secon mathiko var
+            subject: "Forgot password OTP",
+            otp:1234
+        })
+        res.send("Email sent successfully")
+    }
+
+})
 
 
 app.listen(3000,()=>{
