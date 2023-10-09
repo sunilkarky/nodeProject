@@ -69,10 +69,23 @@
     <h2 class="blog-subtitle"><%- blog[0].subTitle%></h2>
     <p class="blog-description"><%-blog[0].description%></p>
     <p class="blog-description">Author: <%-blog[0].user.username%></p>
-    <img src="<%-blog[0].image %>" alt="" height="100px" width="200px"><br> /* "" src ko lai yasma halo vne space wala file ni linxa*/
+    <img src="<%-blog[0].image %>" alt="" height="100px" width="200px"><br> <!--"" src ko lai yasma halo vne space wala file ni linxa*/-->
     <p class="blog-description">Author: <%-blog[0].user.email %></p>
 
-    <button><a href="/delete/<%-blog[0].id%>">Delete</a></button>
-    <button><a href="/edit/<%-blog[0].id%>">Edit</a></button>
+
+
+    <!--//yo chai aba uta app.js bata aako res.locals.current user id haru check garera matra jasko blog ho uslai matrta edit haru garna dina ko la-->
+   <% if(currentUser){  %>  <!-- login xaki xaina-->
+       <% if(currentUserId==blog[0].user.id) { %> <!--login vako  manxe ko id currentuserid ma xa ra blog banako wala blog.user.id ma database ma xa aniusko ko blog hoki haina tyo check garny ani matra-->
+            
+            <button><a href="/delete/<%-blog[0].id%>">Delete</a></button>
+            <button><a href="/edit/<%-blog[0].id%>">Edit</a></button>
+
+       <%} %>
+    
+   <% }%>
+
+    <!-- <button><a href="/delete/<%-blog[0].id%>">Delete</a></button>
+    <button><a href="/edit/<%-blog[0].id%>">Edit</a></button> -->
     <button><a href="/">Cancel</a></button>
 </div>

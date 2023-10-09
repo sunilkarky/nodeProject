@@ -26,6 +26,7 @@ const { JsonWebTokenError, decode } = require("jsonwebtoken")
 const { creatBlog, renderSingleBlog, renderCreatBlog, renderallBlog, renderDeleteBlog, renderEditBlog, editBlog, rendermyBlogs, renderLogout} = require("./controller/blog/blogController");
 const { render } = require("ejs");
 const sendEmail = require("./services/sendEmail");
+const { decodeToken } = require("./services/decodeToken");
 
 const app=express()
 require('dotenv').config() //for encrytping ifle
@@ -49,9 +50,19 @@ app.use(express.urlencoded({extended:true}))
 
 //aba chai login vako lai matra addblog dekhaune haru grna yo grnu prxa i.e check ogin xaki xaina
     //middleware ho yo eakkhalko jun harek [alii trigger garna milxa]
-app.use((req,res,next)=>{  //yo chai harek pali trigger hunxa app.js ma lekheko kura
+app.use(async(req,res,next)=>{  //yo chai harek pali trigger hunxa app.js ma lekheko kura
     // console.log("hello hi ma pheri aaye")             // yo pani eauta middlewaare ho jun harek pali j garda ni trigger hunxa
     res.locals.currentUser=req.cookies.token //yo chai global variable can be used at any place you want i.e currentUser jani acces garna pauxu ma aba
+    
+    //yo chai aba jasle blog banako uslai matra edit delete button dekhaune tyo aaru login xa vaneni login vara aajai id ni check grnu pro ani usko ho vane matra dekhauney edit delete haru
+    
+    const token=req.cookies.token //token launey call garera
+    if(token){   //token xa vane tslai decrypted garney with help of function declared at services decodeToken ma
+        const decryptedResult=await decodeToken(token,process.env.SECRETKEY) //yo output chai id expiry ahru hunxa ni tye
+        if(decryptedResult && decryptedResult.id){     //output aayo ra output vitra id ni aayo vane matra garneyaccess dine
+            res.locals.currentUserId=decryptedResult.id
+        }
+    }
     next()    //next ma janxa mathika vara                               //
 
 })
