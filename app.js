@@ -183,7 +183,9 @@ app.get("/renderForgotPassword",(req,res)=>{
 })
 app.post("/forgotPassword",async(req,res)=>{
     const email=req.body.email
-    console.log(email)
+    const generatedOtp=Math.floor(10000 * Math.random(9999))
+    console.log(generatedOtp)
+    // console.log(email)
     //email hlnu parxa validation
     if(!email){
         return res.send("please provide email")
@@ -200,11 +202,68 @@ app.post("/forgotPassword",async(req,res)=>{
         await sendEmail({   //2 ta argument xa ypo function ko uta  services ko send mail options le chai object linxa
             email:email,  // to: options.email, suruko uta j namko xa key tye linu paro  secon mathiko var
             subject: "Forgot password OTP",
-            otp:1234
+            otp:generatedOtp
         })
-        res.send("Email sent successfully")
+        //aba tyo mathiko otp vanne var ko otp raahileko time database ma ni halnu paro so we do this an save
+        emailExists[0].otp=generatedOtp
+        emailExists[0].otpGenerateTime=Date.now()
+        await emailExists[0].save()
+
+        //now otp halne page ma jane
+        
+        res.redirect("/otp?email="+ email) //yo chai query bata eamil ni pathako mathi search bar ma along with otp so we can access taht eamil and search kun email ko yo otp xa vaner for faster search rather than 
+                                //res.redirect("/otp")//with otp matra search
+        // res.send("Email sent successfully")
+    }
+})
+
+
+app.get("/otp",(req,res)=>{
+    const email=req.query.email// yo chai mathi browser ma aako query bataaccess gareko
+    console.log(email)
+    res.render("otpForm",{email:email}) //mathiko aako pass gareko so api hit garda action ma use garna
+})
+
+app.post("/otp/:id",async(req,res)=>{ //id is email from send otp api redirect jun chai get bata uta passvara ani id ma aara access gareko
+    const otp=req.body.otp
+    const email=req.params.id
+    if(!otp||!email){
+        return res.send("please send email or otp")
+    }
+    //aba find garney tyo email ra otp kunai ko xa ki xaina
+    const userData=await users.findAll({
+        where:{
+        email:email, //email ra otp duitai match then user aauxa natra 0 
+        otp:otp
+        }
+    })
+    if(userData.length==0){
+        return res.send("invalid otp Bro")
+    }else{
+        // res.send("Valid otp") aajai garnu paro aba time limit samman matra otp valid rakhney
+        const currentTime=Date.now() //aaahile ko time
+        const otpGenerateTime=userData[0].otpGenerateTime  //user table ma mathi otp generate vako belako time
+
+        //check for 2 min more or not
+        if(currentTime-otpGenerateTime <= 120000){
+            // res.send("valid OTP")
+            //we can also make our otp null after checking condition to make secure
+            userData[0].otp=null
+            userData[0].otpGenerateTime=null //we cantrack last password change by not making it null
+            userData[0].save()
+            
+            res.redirect("/passwordChange") //password change garne page ma lagney
+        }else{
+            res.send("OTP has expired")
+        }
+    
     }
 
+
+})
+
+app.get("/passwordChange",(req,res)=>{
+    res.render("passwordChange")
 })
 
 

@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define("user", { //blog is name of table in database in plurar form
+    const User = sequelize.define("user", { //blog is name of table in database in plurar form ma basxa
       email: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -12,6 +12,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull:false
       },
+
+      //for otp validation and verification 
+      otp:{
+        type:DataTypes.STRING,
+        allowNull:true
+      },
+      otpGenerateTime:{
+        type:DataTypes.STRING,
+        allowNull:true
+      }
       
     
     });
