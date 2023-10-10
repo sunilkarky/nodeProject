@@ -231,7 +231,10 @@ app.post("/forgotPassword",async(req,res)=>{
 
 app.get("/otp",(req,res)=>{
     const email=req.query.email// yo chai mathi browser ma aako query bataaccess gareko
-    console.log(email)
+     // console.log(email)
+    if(!email){
+        return res.send("no email bro")
+    }
     res.render("otpForm",{email:email}) //mathiko aako pass gareko so api hit garda action ma use garna
 })
 
@@ -259,11 +262,17 @@ app.post("/otp/:id",async(req,res)=>{ //id is email from send otp api redirect j
         if(currentTime-otpGenerateTime <= 120000){
             // res.send("valid OTP")
             //we can also make our otp null after checking condition to make secure
-            userData[0].otp=null
-            userData[0].otpGenerateTime=null //we cantrack last password change by not making it null
-            userData[0].save()
+            //userData[0].otp=null
+            //userData[0].otpGenerateTime=null //we cantrack last password change by not making it null
+            //userData[0].save()                but hacker can bypass it if null rakhium vane by hitting api to go to change password
             
-            res.redirect("/passwordChange") //password change garne page ma lagney
+           // res.redirect("/passwordChange") //password change garne page ma lagney
+           //for more validation we aso pass email and otp so it can be querie in get api and used in post for more validation
+            
+           //string lateral use gareko topass multiple email and otp for more validation
+            res.redirect(`/passwordChange?email=${email}&otp=${otp}`) //"not" `` this symbol
+                                            //  ?email="+ email concatenate ni grera grda hunxa   //this can be accessedd in get api of passwordchange in query
+
         }else{
             res.send("OTP has expired")
         }
@@ -274,8 +283,84 @@ app.post("/otp/:id",async(req,res)=>{ //id is email from send otp api redirect j
 })
 
 app.get("/passwordChange",(req,res)=>{
-    res.render("passwordChange")
+    const email=req.query.email
+    const otp=req.query.otp
+    
+    
+    // console.log(email,otp,email,otp)
+    if(!email||!otp){
+        return res.send("Email and otp should be provided in query")
+    }
+    res.render("passwordChange",{email,otp})
 })
+
+//handle new passeword and confirm password
+app.post("/handlePasswordChange/:email/:otp",async(req,res)=>{
+    const{newPassword,confirmPassword}=req.body
+    // console.log(newPassword)
+    const email=req.params.email
+    const otp=req.params.otp
+    const currentTime=Date.now()
+    
+    // console.log(otp,email)
+    if(!newPassword||!confirmPassword||!email||!otp){
+        return res.send("Please provide new password and confirm password")
+    }
+
+    //checking if that email ko otp hoki haina to make secure yadi browser ma change garera access grxa ki vanera jpt otp bata access nadine 
+    const userData=await users.findAll({
+        where:{
+            email:email,
+            otp:otp
+        }
+    })
+    //match new pass nad confirm password
+    if(newPassword!=confirmPassword){
+        return res.send("Please Match your Password and confirm Password")
+    }
+    
+    if(userData.length==0){
+        return res.send("Why you do this bro Donot attack my website")
+    }
+    const otpGeneratedTime=userData[0].otpGeneratedTime
+    //aba chai forget password garna ni otp expiration time rakhney ani garney
+    if(currentTime - otpGeneratedTime >=3000){
+        return res.send("password reset time expired try again")
+        // res.redirect("/forgotPassword")
+    }
+
+
+    
+
+    //aba password update garnu paro tyo email ko
+    //tara form mata verify otp matra xa aba kasari tha pauney ta kun ko new pass ra confirm pass updatae garney vanera
+    //tesaile aba hami query bata  email pathauxau as in mathi email otp wala ko 
+    //suruma get api bata uta ejs ma form action ma pathaune ani params bata post ma tanne
+
+    //update passwor by two process 
+    //1st process
+    // const hashedPassword=bcrypt.hashSync(newPassword,8)
+    // const userDatas=await users.findAll({ //yesle chai sab find garxa ani update garxa
+    //     where:{email:email}
+    // })
+    // userDatas[0].password=hashedPassword
+    // await userDatas[0].save()
+
+    //2nd process
+    const hashedNewPassword=bcrypt.hashSync(newPassword,8)
+    await users.update({  //yo chai just like eit blog ma vako
+        password:hashedNewPassword   //direct haldinxa yesle chai //users vanne ma jun password xa tsma update garde
+    },{
+        where:{
+            email:email
+        }
+    })
+
+    res.redirect("/login")
+})
+    
+    
+    
 
 
 app.listen(3000,()=>{
