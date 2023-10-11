@@ -17,7 +17,9 @@ exports.renderallBlog=async(req,res)=>{
         }
     })
     // console.log(allblogs)               // next we need to pass it to blogs.ejs file
-    res.render("blogs",{blogs:allblogs}) //blogs j lekhda vo allblogs ma chai dat astore xa tye lekhnu also after join we can acces next table using blog.user.username in ejs file
+    const success=req.flash("success") 
+    const error=req.flash("error") //yo chai uta batab aako flash message readgareko ani success pass gareko
+    res.render("blogs",{blogs:allblogs,success:success,error:error}) //blogs j lekhda vo allblogs ma chai dat astore xa tye lekhnu also after join we can acces next table using blog.user.username in ejs file
 }
 
 exports.renderCreatBlog=(req,res)=>{
@@ -27,7 +29,7 @@ exports.renderCreatBlog=(req,res)=>{
 exports.creatBlog=async (req,res)=>{
     //for image handling
     console.log(req.file) //file type ko chai req.file ma aauxa not body
-    const fileName=req.file.filename   
+    // const fileName=req.file.filename   
 
 
     // console.log(req.user[0].id,"userID from middleware isauthenticated")//aba tanera matra hain table ma user id vanne column ma halnu ni paro nita ie link thyo ni tyo
@@ -42,6 +44,7 @@ exports.creatBlog=async (req,res)=>{
     if(!title||!subtitle||!description||!req.file){  //server validation
         return res.send("please fill aall the fields above")
     }
+    const fileName=req.file.filename 
             //this is to insert into database using sequlite easy feature .create instead of sql insert query
     await blogs.create({  //index.js ma db.blogs xa so j xa tye use
 

@@ -17,6 +17,12 @@ const jwt=require("jsonwebtoken") //npm installjsonwebtoken garera import gareko
 const { configDotenv } = require("dotenv")
 const cookieParser = require("cookie-parser")  //for getting cookie from browser req.cookie.token direct bujdaina so
 
+//for flashing error in same page using npm install express-session connect-flash
+
+const session=require("express-session") //login garda invalid password success vanera same page ma display garauna we use this instead of cookie or res.locals i.e connect-flash
+const flash=require("connect-flash")  //yo require gariyo aba use gar vannu paro 
+
+
 
 //is authenticated ma hhune erequire garne
 const { JsonWebTokenError, decode } = require("jsonwebtoken")
@@ -33,6 +39,17 @@ require('dotenv').config() //for encrytping ifle
 //dbconnection
 require("./model/index")
 require("./middleware/isAuthenticated")
+
+
+
+//use flash eror display
+app.use(session({  //session({le object linxa in key value}) app.use(session({}))
+    secret:"hellowworld", //sign garira hunxum yo secretle sessionlai 
+    resave:false, // efault true hunxa false parda purano ata sessio ma xa vane naya change vayo vne matra linxa natra sam xa vane pailakai rakxa
+    saveUninitialized:  false //data rerad track garney false garda chai 2 tai ma storage kam hunxa ra chainaina
+}))
+
+app.use(flash())  //npm install connect-flash fro ispaly error
 
 
 
@@ -133,8 +150,9 @@ app.post("/register",async(req,res)=>{
 //to login form get k garney after login
 app.get("/login",(req,res)=>{
 
+    const error=req.flash("error")   //yo chai tala bata invalid password huda k agrney vanera login post api bata aako lai var ma store greko ani ejs ma display grna pass gareko
 
-    res.render("login")
+    res.render("login",{error:error})
 })
 app.post("/login",async(req,res)=>{
     // console.log(req.body)
@@ -176,12 +194,19 @@ app.post("/login",async(req,res)=>{
             })
             
             
-            res.send("login Successfull")
+            // res.send("login Successfull")
+            req.flash("success","Logged in Successfully") 
+            req.flash("error","login Failed")//yo chai rakheko session ma anisuccess key ma message
+            res.redirect("/")  //redirect / ma vako xa tyosma blogs render vako xa tya gara yo access garney eauta var ma req.flash("success") garney ani uta ejs ma pass garney
+
 
 
         }
             else{
-                res.send("invalid Password")
+                // res.send("invalid Password")
+                // to flsh messages we have configure in app,js use ma 
+                req.flash("error","Invalid Password")   //we must do display in ejs file b//error key aarko value tyo error key j rakho tsmai baseko hunxa
+                res.redirect("/login")    //flash garesi redirect compulsary garnu paro
             }
         }
     })
@@ -301,6 +326,7 @@ app.post("/handlePasswordChange/:email/:otp",async(req,res)=>{
     const email=req.params.email
     const otp=req.params.otp
     const currentTime=Date.now()
+    console.log(currentTime)
     
     // console.log(otp,email)
     if(!newPassword||!confirmPassword||!email||!otp){
@@ -322,11 +348,13 @@ app.post("/handlePasswordChange/:email/:otp",async(req,res)=>{
     if(userData.length==0){
         return res.send("Why you do this bro Donot attack my website")
     }
-    const otpGeneratedTime=userData[0].otpGeneratedTime
+    const otpGeneratedTime=userData[0].otpGenerateTime
+    console.log(otpGeneratedTime)
+    
     //aba chai forget password garna ni otp expiration time rakhney ani garney
-    if(currentTime - otpGeneratedTime >=3000){
-        return res.send("password reset time expired try again")
-        // res.redirect("/forgotPassword")
+    if(currentTime - otpGeneratedTime >=240000){
+        // return res.send("password reset time expired try again")
+        res.redirect("/renderForgotPassword")  //better ho yo messgae ekhunu vanda
     }
 
 
